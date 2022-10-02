@@ -1,4 +1,4 @@
-use std::io;
+use std::{io};
 
 
 pub struct Numbers {
@@ -75,31 +75,32 @@ pub fn convert_romaniam_digit(
     tens: String,
 ) -> String { 
     if div_five_times == 0 {
-        if div_five_rest == 0 {} 
+        if div_five_rest == 0 {
+            return String::new()
+        } 
         else if div_five_rest == 4
         {
             return format!("{}{}", ones, fives);
         }else
         {
-            for _ in 0..div_five_rest {
-                romanian_dig = romanian_dig + &ones;
-            }
+            return ones.repeat(div_five_rest.
+                try_into().
+                unwrap());
         }
 
     } else if div_five_times == 1 {
         if div_five_rest == 0 {
             return format!("{}", fives);
-        }
-        else if div_five_rest == 4
+        } else if div_five_rest == 4
         {
             return format!("{}{}", ones, tens);
-        }else
-        {
-            romanian_dig = 
-            for _ in 0..div_five_rest {
-                romanian_dig = romanian_dig + &ones;
-            }
+        } else {
+            return fives + &ones.repeat(div_five_rest.
+                try_into().
+                unwrap());
         }
+    } else{
+        panic!("Somehow here")
     }   
 }
 
