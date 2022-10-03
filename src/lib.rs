@@ -46,8 +46,6 @@ fn arab_digit_maker(arab_num: i32) -> Vec<i32> {
     )
     .collect();
 
-    println!("{:?}", arab_digits);
-
     arab_digits
 }
 
@@ -63,8 +61,6 @@ pub fn convert_to_romaniam_num(arab_num: i32) -> String{
         let exp =  digits_length - 1 - count;
         let dec: i32 = ten.pow(exp.try_into().unwrap());
         romanian_number += &convert_romaniam_digit(*arab_digit, dec);
-
-        println!("romanian_number: {:?}", romanian_number);
     }
     
     romanian_number
@@ -82,10 +78,6 @@ fn convert_romaniam_digit(arab_digit: i32, dec: i32) -> String {
     let div_five_rest: i32 = arab_digit % 5;
     let div_five_times: i32 = arab_digit / 5;
     
-    println!("div_five_rest: {div_five_rest}, div_five_times: {div_five_times}, arab_digit: {arab_digit}");
-
-    println!("dec: {dec}");
-    println!("{:?}", romanian_digits);
     let ones = &romanian_digits.get(&dec).unwrap()[0];
     let fives = &romanian_digits.get(&dec).unwrap()[1];
     let tens = &romanian_digits.get(&dec).unwrap()[2];
@@ -122,7 +114,6 @@ fn romanian_digit_translator(
         _ => panic!("Somehow here"),
         };
     }
-
 
 
 #[cfg(test)]
