@@ -7,26 +7,31 @@ pub struct ArabNum {
 
 impl  ArabNum {
     pub fn build() -> Result<ArabNum, &'static str> {
+        
         let mut arab_nubmer: String = String::new();
-
+        
         match io::stdin()
         .read_line(&mut arab_nubmer) {
             Ok(string) => string,
             Err(_) => return Err("Error while readin in the nubmer"),
         };
-    
+        
         let arab_nubmer: i32 = match arab_nubmer.trim().parse() {
             Ok(num) => num,
             Err(_) => return Err("error parsing the number"),
         };
-    
+
+        if arab_nubmer > 3999 {
+            return Err("Too big number")
+        }
+        
         Ok(ArabNum{
             num: arab_nubmer,
         })
     }    
 }
 
-pub fn arab_digir_maker(arab_num: i32) -> Vec<i32> {
+pub fn arab_digit_maker(arab_num: i32) -> Vec<i32> {
     let mut arab_digits = Vec::new();
     
     let ten: i32 = 10;
@@ -46,9 +51,7 @@ pub fn arab_digir_maker(arab_num: i32) -> Vec<i32> {
 }
 
 pub fn convert_to_romaniam_num(arab_num: i32) -> String{
-    let arab_digits = arab_digir_maker(arab_num);
-    
-    println!("{:?}", arab_digits);
+    let arab_digits = arab_digit_maker(arab_num);
     
     let mut romanian_number = String::new();
     
@@ -68,6 +71,7 @@ pub fn convert_romaniam_digit(arab_digit: i32, dec: i32) -> String {
             (1, vec!["I".to_string(), "V".to_string(), "X".to_string()]),
             (10, vec!["X".to_string(), "L".to_string(), "C".to_string()]),
             (100, vec!["C".to_string(), "D".to_string(), "M".to_string()]),
+            (1000, vec!["M".to_string(), "ERR".to_string(), "ERR".to_string()]),
         ]);
 
     let div_five_rest: i32 = arab_digit % 5;
@@ -245,4 +249,19 @@ mod tests {
         assert_eq!(romaniam_num, convert_to_romaniam_num(arab_num))
     }
 
+    #[test]
+    fn test_three_thousand_five_hundred_sixty_eight() {
+        let arab_num = 3568;
+        let romaniam_num = "MMMDLXVIII";
+
+        assert_eq!(romaniam_num, convert_to_romaniam_num(arab_num))
+    }
+
+    #[test]
+    fn test_three_thousand_nine_hundred_ninty_nine() {
+        let arab_num = 3999;
+        let romaniam_num = "MMMCMXCIX";
+
+        assert_eq!(romaniam_num, convert_to_romaniam_num(arab_num))
+    }
 }
