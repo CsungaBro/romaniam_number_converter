@@ -31,21 +31,22 @@ impl  ArabNum {
     }    
 }
 
-pub fn arab_digit_maker(arab_num: i32) -> Vec<i32> {
-    let mut arab_digits = Vec::new();
+fn arab_digit_maker(arab_num: i32) -> Vec<i32> {
     
-    let ten: i32 = 10;
-    for exp in 0..5 {
-        let dec = ten.pow(exp);
-        let digit_remainder = (arab_num / dec) % 10;
-        
-        println!("digit_remainder: {digit_remainder}, dec: {dec}");
-        arab_digits.push(digit_remainder);
-        let times: i32 = arab_num / ten.pow(exp+1);
-        if times == 0 {
-            break
-        }
-    }
+    const RADIX: u32 = 10;
+
+    let arab_digits: Vec<i32> = arab_num
+    .to_string()
+    .chars()
+    .map(|char| char
+        .to_digit(RADIX)
+        .unwrap()
+        .try_into()
+        .unwrap()
+    )
+    .collect();
+
+    println!("{:?}", arab_digits);
 
     arab_digits
 }
@@ -54,65 +55,73 @@ pub fn convert_to_romaniam_num(arab_num: i32) -> String{
     let arab_digits = arab_digit_maker(arab_num);
     
     let mut romanian_number = String::new();
-    
-    for (exp, arab_digit) in arab_digits.iter().enumerate().rev() {
-        let ten: i32 = 10;
-        romanian_number += &convert_romaniam_digit(*arab_digit, ten.pow(exp.try_into().unwrap()));
-        println!("romanian_number: {:?}", romanian_number);
 
+    let ten: i32 = 10;
+    let digits_length = arab_digits.len();
+
+    for (count, arab_digit) in arab_digits.iter().enumerate() {
+        let exp =  digits_length - 1 - count;
+        let dec: i32 = ten.pow(exp.try_into().unwrap());
+        romanian_number += &convert_romaniam_digit(*arab_digit, dec);
+
+        println!("romanian_number: {:?}", romanian_number);
     }
     
     romanian_number
     
 }
 
-pub fn convert_romaniam_digit(arab_digit: i32, dec: i32) -> String { 
+fn convert_romaniam_digit(arab_digit: i32, dec: i32) -> String { 
     let romanian_digits = HashMap::from([
             (1, vec!["I".to_string(), "V".to_string(), "X".to_string()]),
             (10, vec!["X".to_string(), "L".to_string(), "C".to_string()]),
             (100, vec!["C".to_string(), "D".to_string(), "M".to_string()]),
             (1000, vec!["M".to_string(), "ERR".to_string(), "ERR".to_string()]),
         ]);
-
+    
     let div_five_rest: i32 = arab_digit % 5;
     let div_five_times: i32 = arab_digit / 5;
     
+    println!("div_five_rest: {div_five_rest}, div_five_times: {div_five_times}, arab_digit: {arab_digit}");
+
     println!("dec: {dec}");
     println!("{:?}", romanian_digits);
     let ones = &romanian_digits.get(&dec).unwrap()[0];
     let fives = &romanian_digits.get(&dec).unwrap()[1];
     let tens = &romanian_digits.get(&dec).unwrap()[2];
+    
+    romanian_digit_translator(div_five_rest, div_five_times, ones, fives, tens)
+}
 
-    if div_five_times == 0 {
-        if div_five_rest == 0 {
-            return String::new()
-        } 
-        else if div_five_rest == 4
-        {
-            return format!("{}{}", ones, fives);
-        }else
-        {
+fn romanian_digit_translator(
+    div_five_rest: i32,
+    div_five_times: i32,
+    ones: &String,
+    fives: &String,
+    tens: &String) -> String {
+    match div_five_times {
+        0 => {
+        match div_five_rest{ 
+            0 => return String::new(),
+            4 => return format!("{}{}", ones, fives),
+            _ => {
             return ones.repeat(div_five_rest.
                 try_into().
                 unwrap());
-        }
-
-    } else if div_five_times == 1 {
-        if div_five_rest == 0 {
-            return format!("{}", fives);
-        } else if div_five_rest == 4
-        {
-            return format!("{}{}", ones, tens);
-        } else {
+        }}},  
+        1 => {
+        match div_five_rest {
+            0 => return format!("{}", fives),
+            4 => return format!("{}{}", ones, tens),
+            _ => {
             let many_ones = &ones.repeat(div_five_rest.
                 try_into().
                 unwrap());
             return format!("{}{}", fives, many_ones) 
-        }
-    } else{
-        panic!("Somehow here")
-    }   
-}
+        }}},
+        _ => panic!("Somehow here"),
+        };
+    }
 
 
 
@@ -263,5 +272,29 @@ mod tests {
         let romaniam_num = "MMMCMXCIX";
 
         assert_eq!(romaniam_num, convert_to_romaniam_num(arab_num))
+    }
+
+    #[test]
+    fn test_arab_digits_three() {
+        let arab_num = 3;
+        let digits = vec![3];
+
+        assert_eq!(digits, arab_digit_maker(arab_num))
+    }
+
+    #[test]
+    fn test_arab_digits_thirty_one() {
+        let arab_num = 31;
+        let digits = vec![3, 1];
+
+        assert_eq!(digits, arab_digit_maker(arab_num))
+    }
+
+    #[test]
+    fn test_arab_digits_three_thousand_nine_hundred_ninty_nine() {
+        let arab_num = 3999;
+        let digits = vec![3, 9, 9, 9];
+
+        assert_eq!(digits, arab_digit_maker(arab_num))
     }
 }
